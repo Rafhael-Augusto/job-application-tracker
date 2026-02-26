@@ -17,9 +17,9 @@ export function Navbar() {
         </Link>
 
         <div>
-          <Link href={"auth"}>
+          <Link href={"/auth/register"}>
             <Button className="bg-secondary hover:bg-secondary/80 text-primary">
-              Comece de graca
+              Comece de graça
             </Button>
           </Link>
         </div>

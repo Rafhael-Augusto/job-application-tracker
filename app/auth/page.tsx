@@ -1,7 +1,9 @@
+import { SignIn } from "@/components/signIn/signIn";
+
 export default function Auth() {
   return (
     <div>
-      <h1>test</h1>
+      <SignIn />
     </div>
   );
 }
