@@ -6,6 +6,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { redirect } from "next/navigation";
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
@@ -27,4 +28,14 @@ export async function getSession() {
   });
 
   return result;
+}
+
+export async function signOut() {
+  const result = await auth.api.signOut({
+    headers: await headers(),
+  });
+
+  if (result.success) {
+    redirect("/auth/login");
+  }
 }
