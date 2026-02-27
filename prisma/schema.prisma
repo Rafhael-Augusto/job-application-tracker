@@ -75,3 +75,46 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+model Board {
+  id              String           @id @default(uuid())
+  name            String
+  userId          String
+  columns         Column[]
+  jobApplications JobApplication[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Column {
+  id              String           @id @default(uuid())
+  name            String
+  order           Int              @default(0)
+  boardId         String
+  board           Board            @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  jobApplications JobApplication[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model JobApplication {
+  id          String    @id @default(uuid())
+  company     String
+  position    String
+  location    String?
+  status      String    @default("applied")
+  columnId    String
+  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  boardId     String
+  board       Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  userId      String
+  order       Int       @default(0)
+  notes       String?
+  salary      String?
+  jobUrl      String?
+  appliedDate DateTime?
+  tags        String[]
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
