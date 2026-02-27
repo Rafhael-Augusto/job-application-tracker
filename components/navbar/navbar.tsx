@@ -27,7 +27,7 @@ export function Navbar() {
   const handleSignOut = async () => {
     const result = await signOut();
 
-    if (result.data?.success) {
+    if (result.data) {
       router.push("/auth/login");
     } else {
       alert("Erro desconectando");
