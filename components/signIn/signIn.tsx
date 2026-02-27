@@ -1,12 +1,18 @@
 "use client";
 
+import { useState } from "react";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import { signInUser } from "@/app/auth/login/actions";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { FormData, formSchema } from "./schema";
 
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +26,11 @@ import {
 } from "@/components/ui/field";
 
 export function SignIn() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -28,9 +39,19 @@ export function SignIn() {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-  };
+  async function onSubmit(data: FormData) {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await signInUser(data);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err?.message ?? "Ocorreu um erro inesperado. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
@@ -73,12 +94,19 @@ export function SignIn() {
                     <FieldError>{errors.password.message}</FieldError>
                   )}
                 </Field>
+
+                {error && <FieldError>{error}</FieldError>}
               </FieldGroup>
             </FieldSet>
 
             <Field>
-              <Button variant={"secondary"} type="submit" className="w-full">
-                Criar conta
+              <Button
+                variant={"secondary"}
+                type="submit"
+                disabled={isLoading}
+                className="w-full"
+              >
+                {isLoading ? <Spinner /> : "Fazer Login"}
               </Button>
               <p>
                 Não tem uma conta?{" "}
