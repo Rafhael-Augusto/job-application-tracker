@@ -5,6 +5,7 @@ import { FormData } from "@/components/createJobDialog/schema";
 import { getSession } from "../auth/auth";
 
 import db from "../prisma";
+import { revalidatePath } from "next/cache";
 
 type Data = Omit<FormData, "tags"> & {
   tags: string[];
@@ -96,6 +97,8 @@ export async function createJobApplication(data: Data) {
       },
     },
   });
+
+  revalidatePath("/dashboard");
 
   return {
     data: jobApplication,

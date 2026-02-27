@@ -4,20 +4,34 @@ import { redirect } from "next/navigation";
 
 import { getSession } from "@/lib/auth/auth";
 import { KanbanBoard } from "@/components/kanbanBoard/kanbanBoard";
+import { Suspense } from "react";
 
-export default async function Dashboard() {
+async function getBoard(userId: string) {
+  "use cache";
+
+  const board = await db.board.findFirst({
+    where: { userId: userId, name: "Job Hunt" },
+    include: {
+      columns: {
+        include: {
+          jobApplications: true,
+        },
+      },
+      jobApplications: true,
+    },
+  });
+
+  return board;
+}
+
+async function DashboardPage() {
   const session = await getSession();
 
   if (!session?.user) {
     redirect("/auth/login");
   }
 
-  const board = await db.board.findFirst({
-    where: { userId: session.user.id, name: "Job Hunt" },
-    include: {
-      columns: true,
-    },
-  });
+  const board = await getBoard(session.user.id);
 
   const data = {
     board,
@@ -37,5 +51,13 @@ export default async function Dashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<p>loading</p>}>
+      <DashboardPage />
+    </Suspense>
   );
 }

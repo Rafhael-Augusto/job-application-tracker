@@ -56,31 +56,31 @@ export function CreateJobDialog({ createJobData }: Props) {
     setIsLoading(true);
     setError("");
 
-    const result = await createJobApplication({
-      ...data,
-      columnId: createJobData.columnId,
-      boardId: createJobData.boardId,
-      tags: data.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag.length > 0),
-    });
-
-    if (result.error) {
-      setError(result.error);
-    } else {
-      handleDialogClose();
-    }
-
     try {
+      const result = await createJobApplication({
+        ...data,
+        columnId: createJobData.columnId,
+        boardId: createJobData.boardId,
+        tags: data.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+      });
+
+      if (result.error) {
+        setError(result.error);
+      } else {
+        handleDialogClose();
+      }
     } catch (err: any) {
       setError(err);
     } finally {
-      setIsLoading(false);
+      handleDialogClose();
     }
   }
 
   const handleDialogClose = () => {
+    setIsLoading(false);
     setOpen(!open);
     reset();
   };
@@ -88,7 +88,7 @@ export function CreateJobDialog({ createJobData }: Props) {
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogTrigger asChild>
-        <Button className="bg-primary/45">
+        <Button className="bg-primary/45 mt-8">
           <PlusIcon />
           Adicionar Vaga
         </Button>

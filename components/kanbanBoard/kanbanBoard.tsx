@@ -26,9 +26,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { CreateJobDialog } from "@/components/createJobDialog/createJobDialog";
+import { JobApplicationCard } from "@/components/jobApplicationCard/jobApplicationCard";
 
-type BoardType = Prisma.BoardGetPayload<{ include: { columns: true } }>;
-type ColumnType = Prisma.ColumnGetPayload<{}>;
+type BoardType = Prisma.BoardGetPayload<{
+  include: {
+    columns: {
+      include: {
+        jobApplications: true;
+      };
+    };
+  };
+}>;
+
+type ColumnType = Prisma.ColumnGetPayload<{
+  include: {
+    jobApplications: true;
+  };
+}>;
 
 type Props = {
   data: {
@@ -39,11 +53,16 @@ type Props = {
 
 type DroppableColumnType = {
   colData: {
-    key: number;
     column: ColumnType;
     config: (typeof COLUMN_CONFIG)[number];
     boardId: string;
+    sortedColumns: Prisma.ColumnGetPayload<{}>[];
   };
+};
+
+type JobCardType = {
+  job: Prisma.JobApplicationGetPayload<{}>;
+  columns: Prisma.ColumnGetPayload<{}>[];
 };
 
 const COLUMN_CONFIG: Array<{ color: string; icon: ReactNode }> = [
@@ -75,8 +94,11 @@ function DroppableColumn({ colData }: DroppableColumnType) {
     boardId: colData.boardId,
   };
 
+  const sortedJobs =
+    colData.column.jobApplications?.sort((a, b) => a.order - b.order) || [];
+
   return (
-    <Card className="min-w-75 flex shrink-0 shadow-md p-0 border-0 bg-secondary/5">
+    <Card className="min-w-75 flex shadow-md p-0 border-0 bg-secondary/5">
       <CardHeader
         className={cn("text-secondary rounded-t-lg py-3", colData.config.color)}
       >
@@ -104,9 +126,27 @@ function DroppableColumn({ colData }: DroppableColumnType) {
       </CardHeader>
 
       <CardContent className="min-h-100 rounded-b-lg">
+        <div className="flex flex-col gap-2">
+          {sortedJobs.map((job) => (
+            <SortableJobCard
+              key={job.id}
+              job={{ ...job, columnId: job.columnId || colData.column.id }}
+              columns={colData.sortedColumns}
+            />
+          ))}
+        </div>
+
         <CreateJobDialog createJobData={createJobData} />
       </CardContent>
     </Card>
+  );
+}
+
+function SortableJobCard({ job, columns }: JobCardType) {
+  return (
+    <div>
+      <JobApplicationCard job={job} columns={columns} />
+    </div>
   );
 }
 
@@ -116,8 +156,10 @@ export function KanbanBoard({ data }: Props) {
   const board = data.board;
   const columns = board.columns;
 
+  const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
+
   return (
-    <div>
+    <div className="flex flex-col gap-8">
       {columns.map((col, key) => {
         const config = COLUMN_CONFIG[key] || {
           color: "bg-gray-500",
@@ -129,6 +171,7 @@ export function KanbanBoard({ data }: Props) {
           column: col,
           config,
           boardId: board.id,
+          sortedColumns,
         };
 
         return <DroppableColumn colData={colData} key={col.id} />;
