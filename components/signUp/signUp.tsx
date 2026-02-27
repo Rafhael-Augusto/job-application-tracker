@@ -5,8 +5,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { registerUser } from "@/app/auth/register/actionts";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -24,6 +22,7 @@ import {
   FieldLegend,
   FieldSet,
 } from "@/components/ui/field";
+import { authClient } from "@/lib/auth/authClient";
 
 export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +43,12 @@ export function SignUp() {
     setError("");
 
     try {
-      await registerUser(data);
+      await authClient.signUp.email({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+
       router.push("/dashboard");
     } catch (err: any) {
       setError(err?.message ?? "Ocorreu um erro inesperado. Tente novamente.");

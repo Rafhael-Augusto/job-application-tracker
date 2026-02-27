@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { signInUser } from "@/app/auth/login/actions";
+import { authClient } from "@/lib/auth/authClient";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,7 +44,11 @@ export function SignIn() {
     setError("");
 
     try {
-      await signInUser(data);
+      await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+      });
+
       router.push("/dashboard");
     } catch (err: any) {
       setError(err?.message ?? "Ocorreu um erro inesperado. Tente novamente.");
