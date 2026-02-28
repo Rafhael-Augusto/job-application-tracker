@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { createJobApplication } from "@/lib/actions/jobApplications";
+import {
+  createJobApplication,
+  getJobApplication,
+  updateJobApplication,
+} from "@/lib/actions/jobApplications";
 
 import { FormData, formSchema } from "./schema";
-
-import { PlusIcon } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,7 +23,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Field,
@@ -35,37 +36,50 @@ type Props = {
     columnId: string;
     boardId: string;
   };
+  jobApplicationId?: string;
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
 };
 
-export function CreateJobDialog({ createJobData }: Props) {
-  const [open, setOpen] = useState(false);
-
+export function JobDialogForm({
+  createJobData,
+  jobApplicationId,
+  isOpen,
+  setIsOpen,
+}: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-  });
 
   async function onSubmit(data: FormData) {
     setIsLoading(true);
     setError("");
 
     try {
-      const result = await createJobApplication({
-        ...data,
-        columnId: createJobData.columnId,
-        boardId: createJobData.boardId,
-        tags: data.tags
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0),
-      });
+      let result = null;
+
+      if (jobApplicationId) {
+        result = await updateJobApplication(jobApplicationId, {
+          ...data,
+          tags: data.tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0),
+        });
+
+        reset({
+          ...data,
+        });
+      } else {
+        result = await createJobApplication({
+          ...data,
+          columnId: createJobData.columnId,
+          boardId: createJobData.boardId,
+          tags: data.tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0),
+        });
+      }
 
       if (result.error) {
         setError(result.error);
@@ -81,24 +95,58 @@ export function CreateJobDialog({ createJobData }: Props) {
 
   const handleDialogClose = () => {
     setIsLoading(false);
-    setOpen(!open);
+    setIsOpen(!isOpen);
     reset();
   };
 
-  return (
-    <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogTrigger asChild>
-        <Button className="bg-primary/45 mt-8">
-          <PlusIcon />
-          Adicionar Vaga
-        </Button>
-      </DialogTrigger>
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+  });
 
+  useEffect(() => {
+    async function loadData() {
+      if (!jobApplicationId) return;
+
+      const result = await getJobApplication(jobApplicationId);
+
+      if ("error" in result) {
+        setError(result.error);
+        return;
+      }
+
+      if (result) {
+        reset({
+          company: result.company,
+          position: result.position,
+          location: result.location ?? undefined,
+          salary: result.salary ?? undefined,
+          jobUrl: result.jobUrl ?? undefined,
+          tags: result.tags.join(",") ?? undefined,
+          description: result.description ?? undefined,
+          notes: result.notes ?? undefined,
+        });
+      }
+    }
+
+    loadData();
+  }, [jobApplicationId, reset]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="bg-primary  pb-0 text-secondary border-0">
         <DialogHeader>
-          <DialogTitle>Adicionar Candidatura</DialogTitle>
+          <DialogTitle>
+            {jobApplicationId ? "Editar Candidatura" : "Adicionar Candidatura"}
+          </DialogTitle>
           <DialogDescription>
-            Registrar uma nova candidatura de emprego
+            {jobApplicationId
+              ? "Editar candidatura de emprego existente"
+              : "Registrar uma nova candidatura de emprego"}
           </DialogDescription>
         </DialogHeader>
 
@@ -200,7 +248,13 @@ export function CreateJobDialog({ createJobData }: Props) {
 
             <Field>
               <Button type="submit" variant={"secondary"} disabled={isLoading}>
-                {isLoading ? <Spinner /> : "Adicionar Candidatura"}
+                {isLoading ? (
+                  <Spinner />
+                ) : jobApplicationId ? (
+                  "Editar Candidatura"
+                ) : (
+                  "Adicionar Candidatura"
+                )}
               </Button>
               <Button
                 type="button"

@@ -1,10 +1,11 @@
 "use client";
 
-import { ReactNode } from "react";
-
-import { cn } from "@/lib/utils";
+import { ReactNode, useState } from "react";
 
 import { Prisma } from "@/app/generated/prisma/client";
+
+import { useBoard } from "@/lib/hooks/useBoards";
+import { cn } from "@/lib/utils";
 
 import {
   AwardIcon,
@@ -12,12 +13,13 @@ import {
   CheckCircle2Icon,
   MicIcon,
   MoreVerticalIcon,
+  PlusIcon,
   TrashIcon,
   XCircleIcon,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,8 +27,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { CreateJobDialog } from "@/components/createJobDialog/createJobDialog";
 import { JobApplicationCard } from "@/components/jobApplicationCard/jobApplicationCard";
+import { JobDialogForm } from "@/components/jobDialogForm/jobDialogForm";
 
 type BoardType = Prisma.BoardGetPayload<{
   include: {
@@ -89,6 +91,8 @@ const COLUMN_CONFIG: Array<{ color: string; icon: ReactNode }> = [
 ];
 
 function DroppableColumn({ colData }: DroppableColumnType) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const createJobData = {
     columnId: colData.column.id,
     boardId: colData.boardId,
@@ -98,47 +102,64 @@ function DroppableColumn({ colData }: DroppableColumnType) {
     colData.column.jobApplications?.sort((a, b) => a.order - b.order) || [];
 
   return (
-    <Card className="min-w-75 flex shadow-md p-0 border-0 bg-secondary/5">
-      <CardHeader
-        className={cn("text-secondary rounded-t-lg py-3", colData.config.color)}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {colData.config.icon}
-            <CardTitle>{colData.column.name}</CardTitle>
+    <>
+      <Card className="min-w-75 flex shadow-md p-0 border-0 bg-secondary/5">
+        <CardHeader
+          className={cn(
+            "text-secondary rounded-t-lg py-3",
+            colData.config.color,
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {colData.config.icon}
+              <CardTitle>{colData.column.name}</CardTitle>
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={"ghost"}>
+                  <MoreVerticalIcon />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent className="bg-primary text-secondary ">
+                <DropdownMenuItem className="hover:text-destructive">
+                  <TrashIcon className="h-4 w-4" />
+                  <span>Deletar Coluna</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardHeader>
+
+        <CardContent className="min-h-100 rounded-b-lg">
+          <div className="flex flex-col gap-2">
+            {sortedJobs.map((job) => (
+              <SortableJobCard
+                key={job.id}
+                job={{ ...job, columnId: job.columnId || colData.column.id }}
+                columns={colData.sortedColumns}
+              />
+            ))}
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant={"ghost"}>
-                <MoreVerticalIcon />
-              </Button>
-            </DropdownMenuTrigger>
+          <Button
+            className="bg-primary/45 my-4"
+            onClick={() => setIsOpen(true)}
+          >
+            <PlusIcon />
+            Adicionar Vaga
+          </Button>
+        </CardContent>
+      </Card>
 
-            <DropdownMenuContent className="bg-primary text-secondary ">
-              <DropdownMenuItem className="hover:text-destructive">
-                <TrashIcon className="h-4 w-4" />
-                <span>Deletar Coluna</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
-
-      <CardContent className="min-h-100 rounded-b-lg">
-        <div className="flex flex-col gap-2">
-          {sortedJobs.map((job) => (
-            <SortableJobCard
-              key={job.id}
-              job={{ ...job, columnId: job.columnId || colData.column.id }}
-              columns={colData.sortedColumns}
-            />
-          ))}
-        </div>
-
-        <CreateJobDialog createJobData={createJobData} />
-      </CardContent>
-    </Card>
+      <JobDialogForm
+        createJobData={createJobData}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
+    </>
   );
 }
 
@@ -154,7 +175,8 @@ export function KanbanBoard({ data }: Props) {
   if (!data?.board) return null;
 
   const board = data.board;
-  const columns = board.columns;
+
+  const { columns, moveJob } = useBoard({ initialBoard: board });
 
   const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
 
