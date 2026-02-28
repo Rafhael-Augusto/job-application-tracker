@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -86,8 +86,12 @@ export function JobDialogForm({
       } else {
         handleDialogClose();
       }
-    } catch (err: any) {
-      setError(err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Erro inesperado");
+      }
     } finally {
       handleDialogClose();
     }

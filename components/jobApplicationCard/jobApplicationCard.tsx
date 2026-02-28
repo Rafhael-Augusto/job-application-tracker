@@ -2,7 +2,7 @@
 
 import { HTMLAttributes, useState } from "react";
 
-import { Prisma } from "@/app/generated/prisma/client";
+import { Prisma, JobApplication, Column } from "@/app/generated/prisma/client";
 
 import {
   deleteJobApplication,
@@ -29,8 +29,8 @@ import {
 import { JobDialogForm } from "@/components/jobDialogForm/jobDialogForm";
 
 type Props = {
-  job: Prisma.JobApplicationGetPayload<{}>;
-  columns: Prisma.ColumnGetPayload<{}>[];
+  job: JobApplication;
+  columns: Column[];
   dragHandleProps?: HTMLAttributes<HTMLElement>;
 };
 

@@ -21,15 +21,11 @@ type Column = Prisma.ColumnGetPayload<{
 }>;
 
 export function useBoard({ initialBoard }: { initialBoard: Board | null }) {
-  const [board, setBoard] = useState<Board | null>(initialBoard || null);
   const [columns, setColumns] = useState<Column[]>(initialBoard?.columns || []);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialBoard) {
-      setBoard(initialBoard);
-      setColumns(initialBoard.columns || []);
-    }
+    setColumns(initialBoard?.columns ?? []);
   }, [initialBoard]);
 
   async function moveJob(
@@ -98,13 +94,20 @@ export function useBoard({ initialBoard }: { initialBoard: Board | null }) {
         columnId: newColumnId,
         order: newOrder,
       });
-    } catch (err) {
-      console.error("Error saving job application position in board: ", err);
+
+      if (result.error) {
+        setError(result.error);
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Erro inesperado");
+      }
     }
   }
 
   return {
-    board,
     columns,
     error,
     moveJob,

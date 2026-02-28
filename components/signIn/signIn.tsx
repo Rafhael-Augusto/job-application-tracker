@@ -50,8 +50,14 @@ export function SignIn() {
       });
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err?.message ?? "Ocorreu um erro inesperado. Tente novamente.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(
+          err?.message ?? "Ocorreu um erro inesperado. Tente novamente.",
+        );
+      } else {
+        setError("Erro inesperado");
+      }
     } finally {
       setIsLoading(false);
     }

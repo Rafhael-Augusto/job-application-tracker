@@ -39,7 +39,9 @@ export function Hero() {
             Registre, organize e gerencie sua busca por emprego em um só lugar.
           </p>
 
-          <Suspense fallback={<p>loading...</p>}></Suspense>
+          <Suspense fallback={<p>loading...</p>}>
+            <HeroContent />
+          </Suspense>
         </div>
       </section>
     </div>

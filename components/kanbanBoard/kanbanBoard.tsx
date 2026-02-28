@@ -76,13 +76,13 @@ type DroppableColumnType = {
     column: ColumnType;
     config: (typeof COLUMN_CONFIG)[number];
     boardId: string;
-    sortedColumns: Prisma.ColumnGetPayload<{}>[];
+    sortedColumns: Column[];
   };
 };
 
 type JobCardType = {
-  job: Prisma.JobApplicationGetPayload<{}>;
-  columns: Prisma.ColumnGetPayload<{}>[];
+  job: JobApplication;
+  columns: Column[];
 };
 
 const COLUMN_CONFIG: Array<{ color: string; icon: ReactNode }> = [
@@ -234,15 +234,7 @@ function SortableJobCard({ job, columns }: JobCardType) {
 }
 
 export function KanbanBoard({ data }: Props) {
-  if (!data?.board) return null;
-
   const [activeId, setActiveId] = useState<string | null>(null);
-
-  const board = data.board;
-
-  const { columns, moveJob } = useBoard({ initialBoard: board });
-
-  const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -251,6 +243,16 @@ export function KanbanBoard({ data }: Props) {
       },
     }),
   );
+
+  const board = data?.board ?? null;
+
+  const { columns, moveJob } = useBoard({
+    initialBoard: board,
+  });
+
+  if (!board) return null;
+
+  const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
 
   async function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
@@ -261,7 +263,7 @@ export function KanbanBoard({ data }: Props) {
 
     setActiveId(null);
 
-    if (!over || !board.id) return;
+    if (!over || !board?.id) return;
 
     const activeId = active.id as string;
     const overId = over.id as string;
