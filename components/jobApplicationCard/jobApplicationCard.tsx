@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { HTMLAttributes, useState } from "react";
 
 import { Prisma } from "@/app/generated/prisma/client";
 
@@ -31,9 +31,10 @@ import { JobDialogForm } from "@/components/jobDialogForm/jobDialogForm";
 type Props = {
   job: Prisma.JobApplicationGetPayload<{}>;
   columns: Prisma.ColumnGetPayload<{}>[];
+  dragHandleProps?: HTMLAttributes<HTMLElement>;
 };
 
-export function JobApplicationCard({ job, columns }: Props) {
+export function JobApplicationCard({ job, columns, dragHandleProps }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   async function handleMove(newColumnId: string) {
@@ -64,7 +65,10 @@ export function JobApplicationCard({ job, columns }: Props) {
 
   return (
     <>
-      <Card className="bg-secondary/5 border-0 text-secondary">
+      <Card
+        {...dragHandleProps}
+        className="bg-secondary/5 border-0 text-secondary"
+      >
         <CardContent>
           <div className="flex items-start justify-between">
             <div className="flex flex-col gap-2">
