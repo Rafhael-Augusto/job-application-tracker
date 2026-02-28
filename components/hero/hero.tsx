@@ -1,8 +1,31 @@
 import Link from "next/link";
-
+import { getSession } from "@/lib/auth/auth";
 import { ArrowRight } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
+import { Suspense } from "react";
+
+async function HeroContent() {
+  const session = await getSession();
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <Link href={session?.user ? "/dashboard" : "/auth"}>
+        <Button
+          size="lg"
+          variant="secondary"
+          className="h-12 px-8 text-lg font-medium"
+        >
+          {session?.user ? "Dashboard" : "Comece grátis"}{" "}
+          <ArrowRight className="ml-2" />
+        </Button>
+      </Link>
+
+      <p className="text-sm text-muted-foreground">
+        100% gratuito. Sem cartão.
+      </p>
+    </div>
+  );
+}
 
 export function Hero() {
   return (
@@ -16,21 +39,7 @@ export function Hero() {
             Registre, organize e gerencie sua busca por emprego em um só lugar.
           </p>
 
-          <div className="flex flex-col items-center gap-4">
-            <Link href={"/auth"}>
-              <Button
-                size={"lg"}
-                variant={"secondary"}
-                className="h-12 px-8 text-lg font-medium"
-              >
-                Comece grátis <ArrowRight className="ml-2" />
-              </Button>
-            </Link>
-
-            <p className="text-sm text-muted-foreground">
-              100% gratuito. Sem cartão.
-            </p>
-          </div>
+          <Suspense fallback={<p>loading...</p>}></Suspense>
         </div>
       </section>
     </div>

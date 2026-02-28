@@ -4,7 +4,10 @@ import { useState } from "react";
 
 import { Prisma } from "@/app/generated/prisma/client";
 
-import { updateJobApplication } from "@/lib/actions/jobApplications";
+import {
+  deleteJobApplication,
+  updateJobApplication,
+} from "@/lib/actions/jobApplications";
 
 import {
   Edit2Icon,
@@ -38,8 +41,24 @@ export function JobApplicationCard({ job, columns }: Props) {
       const result = await updateJobApplication(job.id, {
         columnId: newColumnId,
       });
+
+      if (result.error) {
+        console.log("Failed to move job application: ", result.error);
+      }
     } catch (err) {
       console.log("Failed to move job application: ", err);
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      const result = await deleteJobApplication(job.id);
+
+      if (result.error) {
+        console.log("Failed to delete job application: ", result.error);
+      }
+    } catch (err) {
+      console.log("Failed to delete job application: ", err);
     }
   }
 
@@ -119,7 +138,10 @@ export function JobApplicationCard({ job, columns }: Props) {
                   )}
 
                   <DropdownMenuGroup>
-                    <DropdownMenuItem className="hover:text-destructive">
+                    <DropdownMenuItem
+                      onClick={() => handleDelete()}
+                      className="hover:text-destructive"
+                    >
                       <TrashIcon />
                       Delete
                     </DropdownMenuItem>

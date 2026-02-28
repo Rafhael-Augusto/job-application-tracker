@@ -239,5 +239,41 @@ export async function getJobApplication(jobApplicationId: string) {
     return { error: "Job application not found" };
   }
 
+  if (jobApplication.userId !== session.user.id) {
+    return {
+      error: "Unauthorized",
+    };
+  }
+
   return jobApplication;
+}
+
+export async function deleteJobApplication(jobApplicationId: string) {
+  const session = await getSession();
+
+  if (!session?.user) {
+    return { error: "Unauthorized" };
+  }
+
+  const jobApplication = await db.jobApplication.findUnique({
+    where: { id: jobApplicationId },
+  });
+
+  if (!jobApplication) {
+    return { error: "Job application not found" };
+  }
+
+  if (jobApplication.userId !== session.user.id) {
+    return {
+      error: "Unauthorized",
+    };
+  }
+
+  await db.jobApplication.delete({ where: { id: jobApplicationId } });
+
+  revalidatePath("/dashboard");
+
+  return {
+    success: true,
+  };
 }
