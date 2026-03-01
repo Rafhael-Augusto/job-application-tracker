@@ -1,11 +1,20 @@
+import { Colors, Icons } from "@/app/generated/prisma/client";
+
 import { db } from "./prisma";
 
-const DEFAULT_COLUMNS = [
-  { name: "Lista de Desejos", order: 0 },
-  { name: "Aplicado", order: 1 },
-  { name: "Em Entrevista", order: 2 },
-  { name: "Oferta Recebida", order: 3 },
-  { name: "Rejeitado", order: 4 },
+type ColumnType = {
+  name: string;
+  order: number;
+  color: Colors;
+  icon: Icons;
+};
+
+const DEFAULT_COLUMNS: ColumnType[] = [
+  { name: "Lista de Desejos", order: 0, color: "CYAN", icon: "CALENDAR" },
+  { name: "Aplicado", order: 1, color: "PURPLE", icon: "CHECK_CIRCLE" },
+  { name: "Em Entrevista", order: 2, color: "GREEN", icon: "MIC" },
+  { name: "Oferta Recebida", order: 3, color: "YELLOW", icon: "AWARD" },
+  { name: "Rejeitado", order: 4, color: "RED", icon: "X_CIRCLE" },
 ];
 
 export async function initializeUserBoard(userId: string) {
@@ -24,6 +33,8 @@ export async function initializeUserBoard(userId: string) {
         columns: {
           create: DEFAULT_COLUMNS.map((col) => ({
             name: col.name,
+            color: col.color,
+            icon: col.icon,
             order: col.order,
           })),
         },

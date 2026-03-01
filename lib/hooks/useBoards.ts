@@ -25,7 +25,17 @@ export function useBoard({ initialBoard }: { initialBoard: Board | null }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setColumns(initialBoard?.columns ?? []);
+    if (!initialBoard) return;
+
+    setColumns((prev) => {
+      const incoming = initialBoard.columns ?? [];
+
+      if (JSON.stringify(prev) === JSON.stringify(incoming)) {
+        return prev;
+      }
+
+      return incoming;
+    });
   }, [initialBoard]);
 
   async function moveJob(
