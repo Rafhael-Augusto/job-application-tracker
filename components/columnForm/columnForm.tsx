@@ -42,6 +42,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { colorsList, colorsMap } from "@/lib/mapping/colors";
+import { createColumn } from "@/lib/actions/columns";
 
 export function BoardForm() {
   const [isOpen, setIsOpen] = useState(false);
@@ -70,8 +71,27 @@ export function BoardForm() {
     },
   });
 
-  async function onSubmit() {
+  async function onSubmit(data: FormData) {
+    setIsLoading(true);
     setError("");
+
+    try {
+      const result = await createColumn(data);
+
+      if (result.error) {
+        setError(result.error);
+      } else {
+        handleDialogClose();
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Erro inesperado");
+      }
+    } finally {
+      handleDialogClose();
+    }
   }
 
   const iconNameInput = watch("icon");
@@ -96,8 +116,6 @@ export function BoardForm() {
 
     return colors;
   }, [colorNameInput]);
-
-  console.log(getColors);
 
   const GetCurrentIcon = iconsMap[iconNameInput];
   const getCurrentColor = colorsMap[colorNameInput];
@@ -129,11 +147,11 @@ export function BoardForm() {
             <FieldGroup>
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="label">Nome *</FieldLabel>
-                  <Input {...register("label")} id="label" placeholder="Nome" />
+                  <FieldLabel htmlFor="name">Nome *</FieldLabel>
+                  <Input {...register("name")} id="name" placeholder="Nome" />
 
-                  {errors.label && (
-                    <FieldError>{errors.label.message}</FieldError>
+                  {errors.name && (
+                    <FieldError>{errors.name.message}</FieldError>
                   )}
                 </Field>
               </FieldGroup>

@@ -5,7 +5,7 @@ import z from "zod";
 const errorMessage = "Mínimo de 3 caracteres";
 
 export const formSchema = z.object({
-  label: z.string().min(3, errorMessage),
+  name: z.string().min(3, errorMessage),
   icon: z.enum(iconsName, "Icone invalido"),
   color: z.enum(colorsName, "Cor invalida"),
 });

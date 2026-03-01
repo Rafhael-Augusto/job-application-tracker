@@ -47,6 +47,9 @@ import {
 
 import { JobApplicationCard } from "@/components/jobApplicationCard/jobApplicationCard";
 import { JobDialogForm } from "@/components/jobDialogForm/jobDialogForm";
+import { iconsMap, iconsMapDbInverted } from "@/lib/mapping/icons";
+import { colorsMap, colorsMapDbInverted } from "@/lib/mapping/colors";
+import { deleteColumn } from "@/lib/actions/columns";
 
 type BoardType = Prisma.BoardGetPayload<{
   include: {
@@ -74,7 +77,6 @@ type Props = {
 type DroppableColumnType = {
   colData: {
     column: ColumnType;
-    config: (typeof COLUMN_CONFIG)[number];
     boardId: string;
     sortedColumns: Column[];
   };
@@ -84,29 +86,6 @@ type JobCardType = {
   job: JobApplication;
   columns: Column[];
 };
-
-const COLUMN_CONFIG: Array<{ color: string; icon: ReactNode }> = [
-  {
-    color: "bg-cyan-600",
-    icon: <CalendarIcon className="h-4 w-4" />,
-  },
-  {
-    color: "bg-purple-600",
-    icon: <CheckCircle2Icon className="h-4 w-4" />,
-  },
-  {
-    color: "bg-green-600",
-    icon: <MicIcon className="h-4 w-4" />,
-  },
-  {
-    color: "bg-yellow-600",
-    icon: <AwardIcon className="h-4 w-4" />,
-  },
-  {
-    color: "bg-red-600",
-    icon: <XCircleIcon className="h-4 w-4" />,
-  },
-];
 
 function DroppableColumn({ colData }: DroppableColumnType) {
   const [isOpen, setIsOpen] = useState(false);
@@ -127,18 +106,20 @@ function DroppableColumn({ colData }: DroppableColumnType) {
     },
   });
 
+  const Icon = iconsMap[iconsMapDbInverted[colData.column.icon]];
+  const color = colorsMap[colorsMapDbInverted[colData.column.color]];
+
+  const handleDelete = async () => {
+    await deleteColumn(colData.column.id);
+  };
+
   return (
     <>
       <Card className="min-w-md flex shadow-md p-0 border-0 bg-secondary/5">
-        <CardHeader
-          className={cn(
-            "text-secondary rounded-t-lg py-3",
-            colData.config.color,
-          )}
-        >
+        <CardHeader className={cn("text-secondary rounded-t-lg py-3", color)}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {colData.config.icon}
+              <Icon />
               <CardTitle>{colData.column.name}</CardTitle>
             </div>
 
@@ -150,7 +131,10 @@ function DroppableColumn({ colData }: DroppableColumnType) {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="bg-primary text-secondary ">
-                <DropdownMenuItem className="hover:text-destructive">
+                <DropdownMenuItem
+                  onClick={() => handleDelete()}
+                  className="hover:text-destructive"
+                >
                   <TrashIcon className="h-4 w-4" />
                   <span>Deletar Coluna</span>
                 </DropdownMenuItem>
@@ -377,15 +361,9 @@ export function KanbanBoard({ data }: Props) {
       <div>
         <div className="flex gap-4 overflow-x-auto pb-4">
           {sortedColumns.map((col, key) => {
-            const config = COLUMN_CONFIG[key] || {
-              color: "bg-gray-500",
-              icon: <CalendarIcon className="h-4 w-4" />,
-            };
-
             const colData = {
               key,
               column: col,
-              config,
               boardId: board.id,
               sortedColumns,
             };
