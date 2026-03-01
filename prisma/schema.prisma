@@ -13,6 +13,32 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Colors {
+  CYAN
+  BLUE
+  PURPLE
+  GREEN
+  YELLOW
+  RED
+  PINK
+}
+
+enum Icons {
+  CALENDAR
+  AWARD
+  CHECK_CIRCLE
+  QUESTION_MARK_CIRCLE
+  MESSAGE_SQUARE
+  MAIL_CHECK
+  ALARM_CLOCK
+  TRASH
+  EYE
+  EYE_CLOSED
+  FLAG
+  MIC
+  X_CIRCLE
+}
+
 model User {
   id            String    @id
   name          String
@@ -89,6 +115,8 @@ model Board {
 model Column {
   id              String           @id @default(uuid())
   name            String
+  color           Colors           @default(CYAN)
+  icon            Icons            @default(CALENDAR)
   order           Int              @default(0)
   boardId         String
   board           Board            @relation(fields: [boardId], references: [id], onDelete: Cascade)
