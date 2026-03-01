@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/auth";
 import { KanbanBoard } from "@/components/kanbanBoard/kanbanBoard";
 import { Suspense } from "react";
+import { BoardForm } from "@/components/columnForm/columnForm";
 
 async function getBoard(userId: string) {
   "use cache";
@@ -43,11 +44,19 @@ async function DashboardPage() {
       {board && (
         <div>
           <div className="mb-6">
-            <h1 className="text-3l font-bold text-secondary">{board.name}</h1>
-            <p className="text-secondary/70">Acompanhe suas candidaturas</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3l font-bold text-secondary">
+                  {board.name}
+                </h1>
+                <p className="text-secondary/70">Acompanhe suas candidaturas</p>
+              </div>
+
+              <BoardForm />
+            </div>
           </div>
 
-          <KanbanBoard data={data} />
+          <KanbanBoard key={board.id} data={data} />
         </div>
       )}
     </div>

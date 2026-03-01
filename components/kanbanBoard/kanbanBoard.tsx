@@ -265,93 +265,103 @@ export function KanbanBoard({ data }: Props) {
 
     if (!over || !board?.id) return;
 
-    const activeId = active.id as string;
-    const overId = over.id as string;
+    function calculateNewPosition(activeId: string, overId: string) {
+      let draggedJob: JobApplication | null = null;
+      let sourcedColumn: Column | null = null;
+      let sourceIndex = -1;
 
-    let draggedJob: JobApplication | null = null;
-    let sourcedColumn: Column | null = null;
-    let sourceIndex = -1;
+      for (const column of sortedColumns) {
+        const jobs =
+          column.jobApplications.sort((a, b) => a.order - b.order) || [];
+        const jobIndex = jobs.findIndex((j) => j.id === activeId);
 
-    for (const column of sortedColumns) {
-      const jobs =
-        column.jobApplications.sort((a, b) => a.order - b.order) || [];
-      const jobIndex = jobs.findIndex((j) => j.id === activeId);
-
-      if (jobIndex !== -1) {
-        draggedJob = jobs[jobIndex];
-        sourcedColumn = column;
-        sourceIndex = jobIndex;
-        break;
+        if (jobIndex !== -1) {
+          draggedJob = jobs[jobIndex];
+          sourcedColumn = column;
+          sourceIndex = jobIndex;
+          break;
+        }
       }
-    }
 
-    if (!draggedJob || !sourcedColumn) return;
+      if (!draggedJob || !sourcedColumn) return;
 
-    const targetColumn = sortedColumns.find((col) => col.id === overId);
-    const targetJob = sortedColumns
-      .flatMap((col) => col.jobApplications || [])
-      .find((job) => job.id === overId);
+      const targetColumn = sortedColumns.find((col) => col.id === overId);
+      const targetJob = sortedColumns
+        .flatMap((col) => col.jobApplications || [])
+        .find((job) => job.id === overId);
 
-    let targetColumnId: string;
-    let newOrder: number;
+      let targetColumnId: string;
+      let newOrder: number;
 
-    if (targetColumn) {
-      targetColumnId = targetColumn.id;
-      const jobsInTarget =
-        targetColumn.jobApplications
-          .filter((job) => job.id !== activeId)
-          .sort((a, b) => a.order - b.order) || [];
+      if (targetColumn) {
+        targetColumnId = targetColumn.id;
+        const jobsInTarget =
+          targetColumn.jobApplications
+            .filter((job) => job.id !== activeId)
+            .sort((a, b) => a.order - b.order) || [];
 
-      newOrder = jobsInTarget.length;
-    } else if (targetJob) {
-      const targetJobColumn = sortedColumns.find((col) =>
-        col.jobApplications.some((j) => j.id === targetJob.id),
-      );
-      targetColumnId = targetJob.columnId || targetJobColumn?.id || "";
+        newOrder = jobsInTarget.length;
+      } else if (targetJob) {
+        const targetJobColumn = sortedColumns.find((col) =>
+          col.jobApplications.some((j) => j.id === targetJob.id),
+        );
+        targetColumnId = targetJob.columnId || targetJobColumn?.id || "";
 
-      if (!targetColumnId) return;
+        if (!targetColumnId) return;
 
-      const targetColumnObject = sortedColumns.find(
-        (col) => col.id === targetColumnId,
-      );
+        const targetColumnObject = sortedColumns.find(
+          (col) => col.id === targetColumnId,
+        );
 
-      if (!targetColumnObject) return;
+        if (!targetColumnObject) return;
 
-      const allJobsInTargetOriginal =
-        targetColumnObject.jobApplications.sort((a, b) => a.order - b.order) ||
-        [];
+        const allJobsInTargetOriginal =
+          targetColumnObject.jobApplications.sort(
+            (a, b) => a.order - b.order,
+          ) || [];
 
-      const allJobsInTargetFiltered =
-        allJobsInTargetOriginal.filter((j) => j.id !== activeId) || [];
+        const allJobsInTargetFiltered =
+          allJobsInTargetOriginal.filter((j) => j.id !== activeId) || [];
 
-      const targetIndexInOriginal = allJobsInTargetOriginal.findIndex(
-        (j) => j.id === overId,
-      );
+        const targetIndexInOriginal = allJobsInTargetOriginal.findIndex(
+          (j) => j.id === overId,
+        );
 
-      const targetIndexInFiltered = allJobsInTargetFiltered.findIndex(
-        (j) => j.id === overId,
-      );
+        const targetIndexInFiltered = allJobsInTargetFiltered.findIndex(
+          (j) => j.id === overId,
+        );
 
-      if (targetIndexInFiltered !== -1) {
-        if (sourcedColumn.id === targetColumnId) {
-          if (sourceIndex < targetIndexInOriginal) {
-            newOrder = targetIndexInFiltered + 1;
+        if (targetIndexInFiltered !== -1) {
+          if (sourcedColumn.id === targetColumnId) {
+            if (sourceIndex < targetIndexInOriginal) {
+              newOrder = targetIndexInFiltered + 1;
+            } else {
+              newOrder = targetIndexInFiltered;
+            }
           } else {
             newOrder = targetIndexInFiltered;
           }
         } else {
-          newOrder = targetIndexInFiltered;
+          newOrder = allJobsInTargetFiltered.length;
         }
       } else {
-        newOrder = allJobsInTargetFiltered.length;
+        return;
       }
-    } else {
-      return;
+
+      if (!targetColumnId) return;
+
+      return {
+        activeId,
+        targetColumnId,
+        newOrder,
+      };
     }
 
-    if (!targetColumnId) return;
+    const result = calculateNewPosition(active.id as string, over.id as string);
 
-    await moveJob(activeId, targetColumnId, newOrder);
+    if (!result) return;
+
+    await moveJob(result.activeId, result.targetColumnId, result.newOrder);
   }
   const activeJob = sortedColumns
     .flatMap((col) => col.jobApplications || [])
@@ -388,7 +398,11 @@ export function KanbanBoard({ data }: Props) {
       <DragOverlay>
         {activeJob && (
           <div className="opacity-50">
-            <JobApplicationCard job={activeJob} columns={sortedColumns} />
+            <JobApplicationCard
+              key={activeJob.id}
+              job={activeJob}
+              columns={sortedColumns}
+            />
           </div>
         )}
       </DragOverlay>

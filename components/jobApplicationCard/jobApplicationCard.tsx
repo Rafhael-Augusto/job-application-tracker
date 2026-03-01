@@ -2,7 +2,7 @@
 
 import { HTMLAttributes, useState } from "react";
 
-import { Prisma, JobApplication, Column } from "@/app/generated/prisma/client";
+import { JobApplication, Column } from "@/app/generated/prisma/client";
 
 import {
   deleteJobApplication,
