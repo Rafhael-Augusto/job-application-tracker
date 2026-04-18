@@ -55,15 +55,9 @@ npm install
 Crie um arquivo .env na raiz do projeto:
 
 ```bash
-DATABASE_URL="postgresql://user:password@localhost:5432/database"
-```
-
-```bash
 BETTER_AUTH_SECRET=better-auth-secret
 BETTER_AUTH_URL=http://localhost:3000
-```
 
-```bash
 DATABASE_URL="data-base-url"
 ```
 
