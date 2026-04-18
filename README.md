@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📌 Job Application Tracker
 
-## Getting Started
+Um tracker de candidaturas de emprego estilo Kanban, onde você pode organizar suas vagas, acompanhar progresso e nunca mais se perder no meio dos processos seletivos.
 
-First, run the development server:
+## ✨ Features
+- 🧱 Board estilo Kanban (arrastar e soltar)
+- ➕ Criar e deletar colunas (ex: “Aplicado”, “Entrevista”, “Oferta”)
+- 📝 Criar, editar e remover vagas
+- 🔀 Mover vagas entre colunas (drag & drop)
+- 🔐 Autenticação (criar conta / login)
+- 🚀 Colunas iniciais já criadas automaticamente ao registrar
+- 💾 Persistência de dados com banco PostgreSQL
+- 🛠️ Tech Stack
+
+## Frontend
+- Next.js 16
+- React 19
+- TailwindCSS
+- shadcn/ui
+- Radix UI
+
+## Backend
+- Next.js (API Routes / Server Actions)
+- Prisma ORM
+- PostgreSQL
+  
+## Outros
+- DnD Kit (drag and drop)
+- React Hook Form
+- Zod (validação)
+- Better Auth (autenticação)
+  
+## 📦 Instalação
+
+### Clone o repositório
+
+```bash
+git clone git@github.com:Rafhael-Augusto/job-application-tracker.git
+```
+
+ Entre na pasta
+ 
+```bash 
+cd job-application-tracker
+```
+
+Instale as dependências
+
+```bash
+npm install
+```
+
+## ⚙️ Configuração
+
+Crie um arquivo .env na raiz do projeto:
+
+```bash
+DATABASE_URL="postgresql://user:password@localhost:5432/database"
+```
+
+```bash
+BETTER_AUTH_SECRET=better-auth-secret
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+```bash
+DATABASE_URL="data-base-url"
+```
+
+Depois rode:
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+## 🚀 Rodando o projeto
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse em:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+## Link pra vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+https://job-application-tracker-nu-three.vercel.app/
+```
