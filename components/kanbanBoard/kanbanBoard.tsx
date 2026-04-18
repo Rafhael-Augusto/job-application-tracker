@@ -1,22 +1,17 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 
 import { Column, JobApplication, Prisma } from "@/app/generated/prisma/client";
 
 import { useBoard } from "@/lib/hooks/useBoards";
 import { cn } from "@/lib/utils";
 
-import {
-  AwardIcon,
-  CalendarIcon,
-  CheckCircle2Icon,
-  MicIcon,
-  MoreVerticalIcon,
-  PlusIcon,
-  TrashIcon,
-  XCircleIcon,
-} from "lucide-react";
+import { colorsMap, colorsMapDbInverted } from "@/lib/mapping/colors";
+import { iconsMap, iconsMapDbInverted } from "@/lib/mapping/icons";
+import { deleteColumn } from "@/lib/actions/columns";
+
+import { MoreVerticalIcon, PlusIcon, TrashIcon } from "lucide-react";
 
 import {
   closestCorners,
@@ -47,9 +42,6 @@ import {
 
 import { JobApplicationCard } from "@/components/jobApplicationCard/jobApplicationCard";
 import { JobDialogForm } from "@/components/jobDialogForm/jobDialogForm";
-import { iconsMap, iconsMapDbInverted } from "@/lib/mapping/icons";
-import { colorsMap, colorsMapDbInverted } from "@/lib/mapping/colors";
-import { deleteColumn } from "@/lib/actions/columns";
 
 type BoardType = Prisma.BoardGetPayload<{
   include: {
@@ -89,6 +81,9 @@ type JobCardType = {
 
 function DroppableColumn({ colData }: DroppableColumnType) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [error, setError] = useState("");
 
   const createJobData = {
     columnId: colData.column.id,
@@ -110,12 +105,33 @@ function DroppableColumn({ colData }: DroppableColumnType) {
   const color = colorsMap[colorsMapDbInverted[colData.column.color]];
 
   const handleDelete = async () => {
-    await deleteColumn(colData.column.id);
+    setIsLoading(true);
+
+    try {
+      const result = await deleteColumn(colData.column.id);
+
+      if (result.error) {
+        setError(result.error);
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Erro inesperado");
+      }
+    } finally {
+      setIsOpen(false);
+    }
   };
 
   return (
     <>
-      <Card className="min-w-md flex shadow-md p-0 border-0 bg-secondary/5">
+      <Card
+        className={cn(
+          "relative min-w-md flex shadow-md p-0 border-0 bg-secondary/5",
+          isLoading && "hidden",
+        )}
+      >
         <CardHeader className={cn("text-secondary rounded-t-lg py-3", color)}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

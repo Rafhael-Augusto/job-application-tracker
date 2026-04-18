@@ -132,7 +132,7 @@ export function BoardForm() {
       <Dialog open={isOpen} onOpenChange={handleDialogClose} modal={false}>
         <div
           className={cn(
-            "backdrop-blur-xs bg-black/50 h-screen w-screen top-0 left-0 z-0",
+            "bg-black/50 h-screen w-screen top-0 left-0 z-10",
             isOpen ? "fixed" : "hidden",
           )}
         />
