@@ -86,6 +86,4 @@ http://localhost:3000
 
 ## Deploy
 
-```bash
 https://job-application-tracker-nu-three.vercel.app/
-```
