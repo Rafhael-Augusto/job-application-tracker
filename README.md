@@ -1,34 +1,36 @@
 # 📌 Job Application Tracker
 
-Um tracker de candidaturas de emprego estilo Kanban, onde você pode organizar suas vagas, acompanhar progresso e nunca mais se perder no meio dos processos seletivos.
+Aplicação fullstack estilo Kanban para organizar candidaturas de emprego e acompanhar o progresso em processos seletivos.
 
-## ✨ Features
-- 🧱 Board estilo Kanban (arrastar e soltar)
-- ➕ Criar e deletar colunas (ex: “Aplicado”, “Entrevista”, “Oferta”)
-- 📝 Criar, editar e remover vagas
-- 🔀 Mover vagas entre colunas (drag & drop)
-- 🔐 Autenticação (criar conta / login)
-- 🚀 Colunas iniciais já criadas automaticamente ao registrar
-- 💾 Persistência de dados com banco PostgreSQL
-- 🛠️ Tech Stack
+## ✨ Funcionalidades
 
-## Frontend
-- Next.js 16
-- React 19
+- Board estilo Kanban com drag & drop
+- Criação e remoção de colunas (ex: Aplicado, Entrevista, Oferta)
+- Criação, edição e remoção de vagas
+- Movimentação de vagas entre colunas
+- Autenticação de usuários
+- Colunas iniciais criadas automaticamente ao registrar
+- Persistência com PostgreSQL
+
+## 🛠️ Tecnologias
+
+### Frontend
+- Next.js
+- React
 - TailwindCSS
 - shadcn/ui
 - Radix UI
 
-## Backend
+### Backend
 - Next.js (API Routes / Server Actions)
 - Prisma ORM
 - PostgreSQL
-  
-## Outros
-- DnD Kit (drag and drop)
+
+### Outros
+- DnD Kit
 - React Hook Form
-- Zod (validação)
-- Better Auth (autenticação)
+- Zod
+- Better Auth
   
 ## 📦 Instalação
 
@@ -82,7 +84,7 @@ http://localhost:3000
 
 
 
-## Link pra vercel
+## Deploy
 
 ```bash
 https://job-application-tracker-nu-three.vercel.app/
