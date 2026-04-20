@@ -1,89 +1,82 @@
-# 📌 Job Application Tracker
+### Job Application Tracker
 
-Aplicação fullstack estilo Kanban para organizar candidaturas de emprego e acompanhar o progresso em processos seletivos.
+Full-stack application for managing job applications, featuring a Kanban-style interface to track progress across recruitment processes.
 
-## ✨ Funcionalidades
+The project simulates a recruitment pipeline, allowing users to organize opportunities and manage different hiring stages in a structured and visual way.
 
-- Board estilo Kanban com drag & drop
-- Criação e remoção de colunas (ex: Aplicado, Entrevista, Oferta)
-- Criação, edição e remoção de vagas
-- Movimentação de vagas entre colunas
-- Autenticação de usuários
-- Colunas iniciais criadas automaticamente ao registrar
-- Persistência com PostgreSQL
+## Features
 
-## 🛠️ Tecnologias
-
-### Frontend
-- Next.js
-- React
-- TailwindCSS
-- shadcn/ui
-- Radix UI
-
-### Backend
-- Next.js (API Routes / Server Actions)
-- Prisma ORM
-- PostgreSQL
-
-### Outros
-- DnD Kit
-- React Hook Form
-- Zod
-- Better Auth
+* Kanban board with drag-and-drop support
+* Create and delete custom columns (e.g., Applied, Interview, Offer)
+* Full CRUD for job entries
+* Move job entries across different stages
+* User authentication
+* Automatic initialization of default columns upon registration
+* Data persistence using PostgreSQL
   
-## 📦 Instalação
+## Tech Stack
+* Frontend
+* Next.js
+* React
+* TailwindCSS
+* shadcn/ui
+* Radix UI
+  
+## Backend
+* Next.js (API Routes / Server Actions)
+* Prisma ORM
+* PostgreSQL
 
-### Clone o repositório
+## Other
+* DnD Kit
+* React Hook Form
+* Zod
+* Better Auth
 
+## Installation
+
+* Clone the repository
 ```bash
 git clone git@github.com:Rafhael-Augusto/job-application-tracker.git
 ```
 
- Entre na pasta
- 
-```bash 
+* Navigate to the project folder
+```bash
 cd job-application-tracker
 ```
 
-Instale as dependências
-
+* Install dependencies
 ```bash
 npm install
 ```
 
-## ⚙️ Configuração
+## Configuration
 
-Crie um arquivo .env na raiz do projeto:
+* Create a .env file in the root of the project:
 
 ```bash
-BETTER_AUTH_SECRET=better-auth-secret
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET="your-secret"
+BETTER_AUTH_URL="http://localhost:3000"
 
-DATABASE_URL="data-base-url"
+DATABASE_URL="your-database-url"
 ```
 
-Depois rode:
+* Then run:
 
 ```bash
 npx prisma generate
 npx prisma migrate dev
 ```
 
-## 🚀 Rodando o projeto
+## Running the project
 
 ```bash
 npm run dev
 ```
 
-Acesse em:
-
-```bash
+* Access the application at:
+  
 http://localhost:3000
-```
 
-
-
-## Deploy
-
+## Deployment
 https://job-application-tracker-nu-three.vercel.app/
