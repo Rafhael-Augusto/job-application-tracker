@@ -14,8 +14,7 @@ The project simulates a recruitment pipeline, allowing users to organize opportu
 * Automatic initialization of default columns upon registration
 * Data persistence using PostgreSQL
   
-## Tech Stack
-* Frontend
+## Frontend
 * Next.js
 * React
 * TailwindCSS
